@@ -90,5 +90,19 @@ jobs:
         # Commit and push
         git add $MANIFEST_FILE
         git commit -m "Update ${{ matrix.service }} image tag to $IMAGE_TAG"
-        git pull --rebase origin main
-        git push
+        
+        # Retry push with random backoff to handle parallel jobs race condition
+        MAX_RETRIES=10
+        for i in $(seq 1 $MAX_RETRIES); do
+          echo "Attempt $i/$MAX_RETRIES: Pulling and pushing..."
+          git pull --rebase origin main
+          if git push; then
+            echo "Push succeeded!"
+            exit 0
+          fi
+          echo "Push failed. Retrying in a few seconds..."
+          sleep $(( $RANDOM % 10 + 5 ))
+        done
+        
+        echo "Failed to push after $MAX_RETRIES attempts."
+        exit 1
