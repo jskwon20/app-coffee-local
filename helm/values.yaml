@@ -1,3 +1,0 @@
-ingress:
-  certificateArn: ""  # Will be overridden by ArgoCD
-  domainName: "gsitm-test.com"
