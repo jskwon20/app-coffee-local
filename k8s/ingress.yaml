@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: coffee-ingress
   annotations:
-    alb.ingress.kubernetes.io/certificate-arn: ${certificate_arn}
+    alb.ingress.kubernetes.io/certificate-arn: REPLACE_WITH_CERTIFICATE_ARN
     alb.ingress.kubernetes.io/group.name: coffee-group
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
     alb.ingress.kubernetes.io/scheme: internet-facing
