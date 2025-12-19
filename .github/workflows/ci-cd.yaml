@@ -80,16 +80,22 @@ jobs:
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         git config --global user.name "github-actions[bot]"
         
-        # Determine manifest file
-        MANIFEST_FILE="k8s/${{ matrix.service }}.yaml"
+        # Kustomize Image Name (must match kustomization.yaml)
+        KUSTOMIZE_IMAGE_NAME="coffee_machine/${{ matrix.service }}"
         
-        # Update image tag using sed
-        # Matches "image: <anything>/coffee_machine:<anything>" and replaces it
-        sed -i "s|image: .*\/coffee_machine:.*|image: $ECR_REGISTRY\/$ECR_REPOSITORY:$IMAGE_TAG|g" $MANIFEST_FILE
+        # Move to dev overlay directory
+        cd k8s/overlays/dev
         
-        # Commit and push
-        git add $MANIFEST_FILE
+        # Update image tag safely using kustomize
+        # This updates the 'newTag' field in kustomization.yaml
+        kustomize edit set image $KUSTOMIZE_IMAGE_NAME=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        
+        # Commit changes
+        git add kustomization.yaml
         git commit -m "Update ${{ matrix.service }} image tag to $IMAGE_TAG"
+        
+        # Return to root
+        cd ../../..
         
         # Retry push with random backoff to handle parallel jobs race condition
         MAX_RETRIES=10
