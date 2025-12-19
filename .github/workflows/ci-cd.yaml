@@ -79,34 +79,35 @@ jobs:
         # Configure Git
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         git config --global user.name "github-actions[bot]"
-        
-        # Kustomize Image Name (must match kustomization.yaml)
-        KUSTOMIZE_IMAGE_NAME="coffee_machine/${{ matrix.service }}"
-        
-        # Move to dev overlay directory
-        cd k8s/overlays/dev
-        
-        # Update image tag safely using kustomize
-        # This updates the 'newTag' field in kustomization.yaml
-        kustomize edit set image $KUSTOMIZE_IMAGE_NAME=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        
-        # Commit changes
-        git add kustomization.yaml
-        git commit -m "Update ${{ matrix.service }} image tag to $IMAGE_TAG"
-        
-        # Return to root
-        cd ../../..
-        
-        # Retry push with random backoff to handle parallel jobs race condition
+
+        # Retry logic: Pull -> Edit -> Commit -> Push
+        # This is necessary because multiple jobs edit the SAME kustomization.yaml file in parallel.
+        # "git pull --rebase" fails when lines conflict. "Reset + Re-apply" is safer.
         MAX_RETRIES=10
         for i in $(seq 1 $MAX_RETRIES); do
-          echo "Attempt $i/$MAX_RETRIES: Pulling and pushing..."
-          git pull --rebase origin main
-          if git push; then
+          echo "Attempt $i/$MAX_RETRIES: Fetching latest code..."
+          
+          # 1. Reset to latest remote state (discarding local conflicts if any)
+          git fetch origin main
+          git reset --hard origin/main
+          
+          # 2. Apply Kustomize change on top of fresh code
+          cd k8s/overlays/dev
+          kustomize edit set image $KUSTOMIZE_IMAGE_NAME=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          cd ../../..
+          
+          # 3. Commit
+          git add k8s/overlays/dev/kustomization.yaml
+          # If no changes (e.g. same tag), commit might fail/be empty, which is fine
+          git commit -m "Update ${{ matrix.service }} image tag to $IMAGE_TAG" || echo "Nothing to commit"
+          
+          # 4. Push
+          if git push origin main; then
             echo "Push succeeded!"
             exit 0
           fi
-          echo "Push failed. Retrying in a few seconds..."
+          
+          echo "Push failed (concurrent update). Retrying in random seconds..."
           sleep $(( $RANDOM % 10 + 5 ))
         done
         
