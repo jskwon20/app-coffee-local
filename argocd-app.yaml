@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: coffee-machine
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/jskwon20/app-coffee-local.git
+    targetRevision: main
+    path: k8s/overlays/local
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
