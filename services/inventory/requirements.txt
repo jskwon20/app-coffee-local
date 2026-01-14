@@ -1,8 +1,9 @@
-fastapi==0.104.1
-uvicorn==0.24.0
-mysql-connector-python==8.2.0
-httpx==0.25.2
-pydantic==2.5.0
+fastapi
+uvicorn
+mysql-connector-python
+httpx
+pydantic
+
 opentelemetry-api
 opentelemetry-sdk
 opentelemetry-exporter-otlp
