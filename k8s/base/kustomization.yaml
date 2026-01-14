@@ -4,9 +4,6 @@ kind: Kustomization
 resources:
   - billing.yaml
   - frontend.yaml
-  - ingress-class.yaml
-  - ingress-params.yaml
-  - ingress.yaml
   - inventory.yaml
   - mysql.yaml
   - order.yaml
