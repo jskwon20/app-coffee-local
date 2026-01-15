@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-rbac-cm
+  namespace: argocd
+data:
+  policy.csv: |
+    # role:developer 정의
+    # 권한: applications의 get, sync 허용 (수정/삭제 불가)
+    p, role:developer, applications, get, */*, allow
+    p, role:developer, applications, sync, */*, allow
+    
+    # developer 계정에게 role:developer 부여
+    g, developer, role:developer
+
+    # role:admin 정의 (모든 권한 허용)
+    p, role:admin, *, *, */*, allow
+    
+    # jskwon@gsitm.com 계정에게 role:admin 부여
+    g, jskwon@gsitm.com, role:admin

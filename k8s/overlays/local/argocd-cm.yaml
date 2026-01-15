@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+  namespace: argocd
+data:
+  # developer 사용자 추가 (apiKey, login 권한 부여)
+  accounts.jskwon@gsitm.com: apiKey, login
+  accounts.developer: apiKey, login
