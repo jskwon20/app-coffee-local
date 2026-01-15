@@ -3,6 +3,9 @@ kind: ConfigMap
 metadata:
   name: argocd-cm
   namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-cm
+    app.kubernetes.io/part-of: argocd
 data:
   # developer 사용자 추가 (apiKey, login 권한 부여)
   accounts.jskwon: apiKey, login
