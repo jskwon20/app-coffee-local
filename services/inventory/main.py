@@ -11,6 +11,7 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
+from opentelemetry.instrumentation.mysql import MySQLInstrumentor
 
 
 app = FastAPI()
@@ -24,6 +25,7 @@ trace.get_tracer_provider().add_span_processor(span_processor)
 
 FastAPIInstrumentor.instrument_app(app)
 HTTPXClientInstrumentor().instrument()
+MySQLInstrumentor().instrument()
 # ---------------------------
 
 
