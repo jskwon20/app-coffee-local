@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: inventory
 spec:
+  revisionHistoryLimit: 2
   replicas: 1
   selector:
     matchLabels:
