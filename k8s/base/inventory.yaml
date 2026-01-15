@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: inventory
-        image: 637341921879.dkr.ecr.ap-northeast-2.amazonaws.com/coffee_machine:inventory-ac08d88aa295797813cfd89c90b4a37e5eeae9e1
+        image: 637341921879.dkr.ecr.ap-northeast-2.amazonaws.com/coffee_machine:inventory-207a57d0878f58d37e00ea9c39069aa84a74dad7
         imagePullPolicy: Always
         ports:
         - containerPort: 8000
