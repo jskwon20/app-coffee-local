@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: 637341921879.dkr.ecr.ap-northeast-2.amazonaws.com/coffee_machine:frontend-207a57d0878f58d37e00ea9c39069aa84a74dad7
+        image: 637341921879.dkr.ecr.ap-northeast-2.amazonaws.com/coffee_machine:frontend-050f706852e9b2cbe60b2420d5aba065fa84b64a
         imagePullPolicy: Always
         ports:
         - containerPort: 80
