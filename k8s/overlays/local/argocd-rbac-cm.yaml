@@ -18,6 +18,3 @@ data:
 
     # role:admin 정의 (모든 권한 허용)
     p, role:admin, *, *, */*, allow
-    
-    # jskwon 계정에게 role:admin 부여
-    g, jskwon, role:admin

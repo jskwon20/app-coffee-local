@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitlab
+  namespace: gitlab
+  labels:
+    app: gitlab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gitlab
+  template:
+    metadata:
+      labels:
+        app: gitlab
+    spec:
+      containers:
+      - name: gitlab
+        image: gitlab/gitlab-ce:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 443
+          name: https
+        - containerPort: 22
+          name: ssh
+        env:
+        - name: GITLAB_OMNIBUS_CONFIG
+          value: |
+            external_url 'https://gitlab.192.168.38.140.nip.io'
+            gitlab_rails['gitlab_shell_ssh_port'] = 30022
+            nginx['listen_port'] = 80
+            nginx['listen_https'] = false
+            nginx['redirect_http_to_https'] = false
+            # Performance Tuning
+            puma['worker_processes'] = 2
+            sidekiq['max_concurrency'] = 10
+            prometheus_monitoring['enable'] = false
+            gitlab_rails['env'] = { 'MALLOC_CONF' => 'dirty_decay_ms:1000,muzzy_decay_ms:1000' }
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+          limits:
+            memory: "6Gi"
+            cpu: "2000m"
+        volumeMounts:
+        - name: gitlab-data
+          mountPath: /etc/gitlab
+          subPath: config
+        - name: gitlab-data
+          mountPath: /var/log/gitlab
+          subPath: logs
+        - name: gitlab-data
+          mountPath: /var/opt/gitlab
+          subPath: data
+      volumes:
+      - name: gitlab-data
+        persistentVolumeClaim:
+          claimName: gitlab-data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gitlab-data
+  namespace: gitlab
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
